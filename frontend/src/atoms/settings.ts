@@ -145,7 +145,7 @@ export const servedFromReverseProxySubDirState = atom<string>({
 
 export const appTitleState = atom({
   key: 'appTitleState',
-  default: localStorage.getItem('appTitle') ?? 'yt-dlp Web UI',
+  default: localStorage.getItem('appTitle') ?? `Sanity's YouTube Downloader`,
   effects: [
     ({ onSet }) =>
       onSet(a => localStorage.setItem('appTitle', a.toString()))
