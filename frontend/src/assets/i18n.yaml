@@ -39,6 +39,7 @@ languages:
     newDownloadButton: New download
     homeButtonLabel: Home
     archiveButtonLabel: Archive
+    restartButtonLabel: Restart Service
     settingsButtonLabel: Settings
     rpcAuthenticationLabel: RPC authentication
     themeTogglerLabel: Theme toggler

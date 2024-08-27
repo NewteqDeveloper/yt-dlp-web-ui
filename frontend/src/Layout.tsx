@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@emotion/react'
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArchiveIcon from '@mui/icons-material/Archive'
 import ChevronLeft from '@mui/icons-material/ChevronLeft'
 import Dashboard from '@mui/icons-material/Dashboard'
@@ -119,6 +120,19 @@ export default function Layout() {
                   <ArchiveIcon />
                 </ListItemIcon>
                 <ListItemText primary={i18n.t('archiveButtonLabel')} />
+              </ListItemButton>
+            </Link>
+            <Link to='/restart' style={
+              {
+                textDecoration: 'none',
+                color: mode === 'dark' ? '#ffffff' : '#000000DE'
+              }
+            }>
+              <ListItemButton>
+                <ListItemIcon>
+                  <RestartAltIcon />
+                </ListItemIcon>
+                <ListItemText primary={i18n.t('restartButtonLabel')} />
               </ListItemButton>
             </Link>
             <Link to={'/log'} style={
