@@ -1,15 +1,16 @@
-import { CircularProgress } from '@mui/material'
-import { Suspense, lazy } from 'react'
-import { createHashRouter } from 'react-router-dom'
-import Layout from './Layout'
-import Terminal from './views/Terminal'
+import { CircularProgress } from '@mui/material';
+import { Suspense, lazy } from 'react';
+import { createHashRouter } from 'react-router-dom';
+import Layout from './Layout';
+import Terminal from './views/Terminal';
 
-const Home = lazy(() => import('./views/Home'))
-const Login = lazy(() => import('./views/Login'))
-const Archive = lazy(() => import('./views/Archive'))
-const Settings = lazy(() => import('./views/Settings'))
+const Home = lazy(() => import('./views/Home'));
+const Login = lazy(() => import('./views/Login'));
+const Archive = lazy(() => import('./views/Archive'));
+const Settings = lazy(() => import('./views/Settings'));
+const Restart = lazy(() => import('./views/RestartService'));
 
-const ErrorBoundary = lazy(() => import('./components/ErrorBoundary'))
+const ErrorBoundary = lazy(() => import('./components/ErrorBoundary'));
 
 export const router = createHashRouter([
   {
@@ -21,59 +22,72 @@ export const router = createHashRouter([
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Home />
-          </Suspense >
+          </Suspense>
         ),
         errorElement: (
           <Suspense fallback={<CircularProgress />}>
             <ErrorBoundary />
-          </Suspense >
-        )
+          </Suspense>
+        ),
       },
       {
         path: '/settings',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Settings />
-          </Suspense >
-        )
+          </Suspense>
+        ),
       },
       {
         path: '/log',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Terminal />
-          </Suspense >
-        )
+          </Suspense>
+        ),
       },
       {
         path: '/archive',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Archive />
-          </Suspense >
+          </Suspense>
         ),
         errorElement: (
           <Suspense fallback={<CircularProgress />}>
             <ErrorBoundary />
-          </Suspense >
-        )
+          </Suspense>
+        ),
+      },
+      {
+        path: '/restart',
+        element: (
+          <Suspense fallback={<CircularProgress />}>
+            <Restart />
+          </Suspense>
+        ),
+        errorElement: (
+          <Suspense fallback={<CircularProgress />}>
+            <ErrorBoundary />
+          </Suspense>
+        ),
       },
       {
         path: '/login',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Login />
-          </Suspense >
-        )
+          </Suspense>
+        ),
       },
       {
         path: '/error',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <ErrorBoundary />
-          </Suspense >
-        )
+          </Suspense>
+        ),
       },
-    ]
+    ],
   },
-])
+]);
