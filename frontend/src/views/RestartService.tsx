@@ -12,6 +12,7 @@ export default function RestartService() {
 
   const handleRestart = async () => {
     setLoading(true);
+    debugger;
     try {
       const response = await ffetch(`${serverAddr}/restart-service`, {
         method: 'POST',

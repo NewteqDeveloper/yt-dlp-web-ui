@@ -179,6 +179,11 @@ func newServer(c serverConfig) *http.Server {
 		r.Get("/bulk", handlers.BulkDownload(c.mdb))
 	})
 
+	// Restart service routes
+	r.Route("restart-service", func(r chi.Router) {
+		r.Post("/", handlers.RestartService)
+	})
+
 	// Authentication routes
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/login", handlers.Login)
