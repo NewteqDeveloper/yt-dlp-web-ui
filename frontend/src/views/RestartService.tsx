@@ -29,8 +29,19 @@ export default function RestartService() {
   };
 
   return (
-    <div>
-      <Button variant="contained" color="secondary" onClick={handleRestart} disabled={loading}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: '4rem',
+      }}
+    >
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={handleRestart}
+        disabled={loading}
+      >
         {loading ? <CircularProgress size={24} /> : 'Restart Service'}
       </Button>
     </div>
