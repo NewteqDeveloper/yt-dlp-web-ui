@@ -6,9 +6,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal"
-
-	"os"
-	"os/exec"
 )
 
 type Handler struct {
