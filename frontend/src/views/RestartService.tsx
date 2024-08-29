@@ -16,8 +16,6 @@ export default function RestartService() {
         method: 'POST',
       });
 
-      console.log('actual reponse', response);
-
       if (response.ok) {
         pushMessage('Service restarted successfully!', 'success');
       } else {
