@@ -2,7 +2,6 @@ import { Button, CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { serverURL } from '../atoms/settings';
-import { ffetch } from '../lib/httpClient';
 import { useToast } from '../hooks/toast';
 
 export default function RestartService() {
@@ -12,11 +11,13 @@ export default function RestartService() {
 
   const handleRestart = async () => {
     setLoading(true);
-    debugger;
     try {
-      const response = await ffetch(`${serverAddr}/restart-service`, {
+      const response = await fetch(`${serverAddr}/restart-service`, {
         method: 'POST',
       });
+
+      console.log('actual reponse', response);
+
       if (response.ok) {
         pushMessage('Service restarted successfully!', 'success');
       } else {

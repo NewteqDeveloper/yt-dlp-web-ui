@@ -180,7 +180,7 @@ func newServer(c serverConfig) *http.Server {
 	})
 
 	// Restart service routes
-	r.Route("restart-service", func(r chi.Router) {
+	r.Route("/restart-service", func(r chi.Router) {
 		r.Post("/", handlers.RestartService)
 	})
 
