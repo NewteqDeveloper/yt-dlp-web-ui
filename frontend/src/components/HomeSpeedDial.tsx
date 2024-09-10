@@ -1,30 +1,32 @@
-import AddCircleIcon from '@mui/icons-material/AddCircle'
-import BuildCircleIcon from '@mui/icons-material/BuildCircle'
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import FolderZipIcon from '@mui/icons-material/FolderZip'
-import FormatListBulleted from '@mui/icons-material/FormatListBulleted'
-import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
-import {
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon
-} from '@mui/material'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { listViewState, serverURL } from '../atoms/settings'
-import { useI18n } from '../hooks/useI18n'
-import { useRPC } from '../hooks/useRPC'
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import FolderZipIcon from '@mui/icons-material/FolderZip';
+import FormatListBulleted from '@mui/icons-material/FormatListBulleted';
+import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
+import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { listViewState, serverURL } from '../atoms/settings';
+import { useI18n } from '../hooks/useI18n';
+import { useRPC } from '../hooks/useRPC';
 
 type Props = {
-  onDownloadOpen: () => void
-  onEditorOpen: () => void
-}
+  onDownloadOpen: () => void;
+  onEditorOpen: () => void;
+  onDownloadPersistOpen: () => void;
+};
 
-const HomeSpeedDial: React.FC<Props> = ({ onDownloadOpen, onEditorOpen }) => {
-  const serverAddr = useRecoilValue(serverURL)
-  const [listView, setListView] = useRecoilState(listViewState)
+const HomeSpeedDial: React.FC<Props> = ({
+  onDownloadOpen,
+  onEditorOpen,
+  onDownloadPersistOpen,
+}) => {
+  const serverAddr = useRecoilValue(serverURL);
+  const [listView, setListView] = useRecoilState(listViewState);
 
-  const { i18n } = useI18n()
-  const { client } = useRPC()
+  const { i18n } = useI18n();
+  const { client } = useRPC();
 
   return (
     <SpeedDial
@@ -35,12 +37,16 @@ const HomeSpeedDial: React.FC<Props> = ({ onDownloadOpen, onEditorOpen }) => {
       <SpeedDialAction
         icon={listView ? <ViewAgendaIcon /> : <FormatListBulleted />}
         tooltipTitle={listView ? 'Card view' : 'Table view'}
-        onClick={() => setListView(state => !state)}
+        onClick={() => setListView((state) => !state)}
       />
       <SpeedDialAction
         icon={<FolderZipIcon />}
         tooltipTitle={i18n.t('bulkDownload')}
-        onClick={() => window.open(`${serverAddr}/archive/bulk?token=${localStorage.getItem('token')}`)}
+        onClick={() =>
+          window.open(
+            `${serverAddr}/archive/bulk?token=${localStorage.getItem('token')}`
+          )
+        }
       />
       <SpeedDialAction
         icon={<DeleteForeverIcon />}
@@ -57,8 +63,13 @@ const HomeSpeedDial: React.FC<Props> = ({ onDownloadOpen, onEditorOpen }) => {
         tooltipTitle={i18n.t('newDownloadButton')}
         onClick={onDownloadOpen}
       />
+      <SpeedDialAction
+        icon={<DownloadForOfflineRoundedIcon />}
+        tooltipTitle={i18n.t('newPersistDownloadButton')}
+        onClick={onDownloadPersistOpen}
+      />
     </SpeedDial>
-  )
-}
+  );
+};
 
-export default HomeSpeedDial
+export default HomeSpeedDial;

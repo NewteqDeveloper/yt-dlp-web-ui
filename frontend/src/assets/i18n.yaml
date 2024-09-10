@@ -37,6 +37,7 @@ languages:
     servedFromReverseProxyCheckbox: Is behind a reverse proxy
     urlBase: URL base, for reverse proxy support (subdir), defaults to empty
     newDownloadButton: New download
+    newPersistDownloadButton: Download stay open
     homeButtonLabel: Home
     archiveButtonLabel: Archive
     restartButtonLabel: Restart Service
