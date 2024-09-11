@@ -5,6 +5,7 @@ import Layout from './Layout';
 import Terminal from './views/Terminal';
 
 const Home = lazy(() => import('./views/Home'));
+const Download = lazy(() => import('./views/Download'));
 const Login = lazy(() => import('./views/Login'));
 const Archive = lazy(() => import('./views/Archive'));
 const Settings = lazy(() => import('./views/Settings'));
@@ -22,6 +23,19 @@ export const router = createHashRouter([
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Home />
+          </Suspense>
+        ),
+        errorElement: (
+          <Suspense fallback={<CircularProgress />}>
+            <ErrorBoundary />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/download',
+        element: (
+          <Suspense fallback={<CircularProgress />}>
+            <Download />
           </Suspense>
         ),
         errorElement: (
