@@ -16,7 +16,6 @@ import {
   TextField,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
-import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -25,7 +24,6 @@ import {
   FC,
   Suspense,
   forwardRef,
-  useEffect,
   useRef,
   useState,
   useTransition,
@@ -88,10 +86,6 @@ const DownloadPersist: FC = () => {
   const customFilenameInputRef = useRef<HTMLInputElement>(null);
 
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setCustomArgs('');
-  }, [open]);
 
   /**
    * Retrive url from input, cli-arguments from checkboxes and emits via WebSocket
@@ -169,10 +163,6 @@ const DownloadPersist: FC = () => {
 
   return (
     <>
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={true}
-      />
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton
@@ -184,7 +174,7 @@ const DownloadPersist: FC = () => {
             <CloseIcon />
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-            Download
+            Download multiple times
           </Typography>
         </Toolbar>
       </AppBar>
