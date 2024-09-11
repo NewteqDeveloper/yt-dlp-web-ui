@@ -5,11 +5,11 @@ import Layout from './Layout';
 import Terminal from './views/Terminal';
 
 const Home = lazy(() => import('./views/Home'));
-const Download = lazy(() => import('./views/Download'));
 const Login = lazy(() => import('./views/Login'));
 const Archive = lazy(() => import('./views/Archive'));
 const Settings = lazy(() => import('./views/Settings'));
 const Restart = lazy(() => import('./views/RestartService'));
+const Download = lazy(() => import('./views/Download'));
 
 const ErrorBoundary = lazy(() => import('./components/ErrorBoundary'));
 
@@ -32,7 +32,7 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: '/download',
+        path: '/download-multi',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Download />
