@@ -1,55 +1,58 @@
-import { ThemeProvider } from '@emotion/react'
+import { ThemeProvider } from '@emotion/react';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import ArchiveIcon from '@mui/icons-material/Archive'
-import ChevronLeft from '@mui/icons-material/ChevronLeft'
-import Dashboard from '@mui/icons-material/Dashboard'
-import Menu from '@mui/icons-material/Menu'
-import SettingsIcon from '@mui/icons-material/Settings'
-import TerminalIcon from '@mui/icons-material/Terminal'
-import { Box, createTheme } from '@mui/material'
-import CssBaseline from '@mui/material/CssBaseline'
-import Divider from '@mui/material/Divider'
-import IconButton from '@mui/material/IconButton'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import { grey } from '@mui/material/colors'
-import { useMemo, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
-import { useRecoilValue } from 'recoil'
-import { settingsState } from './atoms/settings'
-import AppBar from './components/AppBar'
-import Drawer from './components/Drawer'
-import Footer from './components/Footer'
-import Logout from './components/Logout'
-import SocketSubscriber from './components/SocketSubscriber'
-import ThemeToggler from './components/ThemeToggler'
-import { useI18n } from './hooks/useI18n'
-import Toaster from './providers/ToasterProvider'
+import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import Dashboard from '@mui/icons-material/Dashboard';
+import Menu from '@mui/icons-material/Menu';
+import SettingsIcon from '@mui/icons-material/Settings';
+import TerminalIcon from '@mui/icons-material/Terminal';
+import { Box, createTheme } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { grey } from '@mui/material/colors';
+import { useMemo, useState } from 'react';
+import { Link, Outlet } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { settingsState } from './atoms/settings';
+import AppBar from './components/AppBar';
+import Drawer from './components/Drawer';
+import Footer from './components/Footer';
+import Logout from './components/Logout';
+import SocketSubscriber from './components/SocketSubscriber';
+import ThemeToggler from './components/ThemeToggler';
+import { useI18n } from './hooks/useI18n';
+import Toaster from './providers/ToasterProvider';
 
 export default function Layout() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
-  const settings = useRecoilValue(settingsState)
+  const settings = useRecoilValue(settingsState);
 
-  const mode = settings.theme
-  const theme = useMemo(() =>
-    createTheme({
-      palette: {
-        mode: settings.theme,
-        background: {
-          default: settings.theme === 'light' ? grey[50] : '#121212'
+  const mode = settings.theme;
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: settings.theme,
+          background: {
+            default: settings.theme === 'light' ? grey[50] : '#121212',
+          },
         },
-      },
-    }), [settings.theme]
-  )
+      }),
+    [settings.theme]
+  );
 
-  const toggleDrawer = () => setOpen(state => !state)
+  const toggleDrawer = () => setOpen((state) => !state);
 
-  const { i18n } = useI18n()
+  const { i18n } = useI18n();
 
   return (
     <ThemeProvider theme={theme}>
@@ -96,12 +99,13 @@ export default function Layout() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            <Link to={'/'} style={
-              {
+            <Link
+              to={'/'}
+              style={{
                 textDecoration: 'none',
-                color: mode === 'dark' ? '#ffffff' : '#000000DE'
-              }
-            }>
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
               <ListItemButton>
                 <ListItemIcon>
                   <Dashboard />
@@ -109,12 +113,13 @@ export default function Layout() {
                 <ListItemText primary={i18n.t('homeButtonLabel')} />
               </ListItemButton>
             </Link>
-            <Link to={'/archive'} style={
-              {
+            <Link
+              to={'/archive'}
+              style={{
                 textDecoration: 'none',
-                color: mode === 'dark' ? '#ffffff' : '#000000DE'
-              }
-            }>
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
               <ListItemButton>
                 <ListItemIcon>
                   <ArchiveIcon />
@@ -122,12 +127,27 @@ export default function Layout() {
                 <ListItemText primary={i18n.t('archiveButtonLabel')} />
               </ListItemButton>
             </Link>
-            <Link to='/restart' style={
-              {
+            <Link
+              to="/download"
+              style={{
                 textDecoration: 'none',
-                color: mode === 'dark' ? '#ffffff' : '#000000DE'
-              }
-            }>
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <DownloadForOfflineRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary={i18n.t('newPersistDownloadButton')} />
+              </ListItemButton>
+            </Link>
+            <Link
+              to="/restart"
+              style={{
+                textDecoration: 'none',
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
               <ListItemButton>
                 <ListItemIcon>
                   <RestartAltIcon />
@@ -135,12 +155,13 @@ export default function Layout() {
                 <ListItemText primary={i18n.t('restartButtonLabel')} />
               </ListItemButton>
             </Link>
-            <Link to={'/log'} style={
-              {
+            <Link
+              to={'/log'}
+              style={{
                 textDecoration: 'none',
-                color: mode === 'dark' ? '#ffffff' : '#000000DE'
-              }
-            }>
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
               <ListItemButton>
                 <ListItemIcon>
                   <TerminalIcon />
@@ -148,12 +169,13 @@ export default function Layout() {
                 <ListItemText primary={i18n.t('logsTitle')} />
               </ListItemButton>
             </Link>
-            <Link to={'/settings'} style={
-              {
+            <Link
+              to={'/settings'}
+              style={{
                 textDecoration: 'none',
-                color: mode === 'dark' ? '#ffffff' : '#000000DE'
-              }
-            }>
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
               <ListItemButton>
                 <ListItemIcon>
                   <SettingsIcon />
@@ -180,5 +202,5 @@ export default function Layout() {
       <Footer />
       <Toaster />
     </ThemeProvider>
-  )
+  );
 }

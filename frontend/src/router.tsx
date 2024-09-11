@@ -32,7 +32,7 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: '/download-multi',
+        path: '/download',
         element: (
           <Suspense fallback={<CircularProgress />}>
             <Download />
