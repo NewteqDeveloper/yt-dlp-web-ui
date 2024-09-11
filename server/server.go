@@ -1,3 +1,4 @@
+// a stupid package name...
 package server
 
 import (
@@ -22,6 +23,7 @@ import (
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/dbutil"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/handlers"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal"
+	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal/livestream"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/logging"
 	middlewares "github.com/marcopeocchi/yt-dlp-web-ui/server/middleware"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/openid"
@@ -44,22 +46,24 @@ type RunConfig struct {
 type serverConfig struct {
 	frontend fs.FS
 	swagger  fs.FS
-	logger   *slog.Logger
 	host     string
 	port     int
 	mdb      *internal.MemoryDB
 	db       *sql.DB
 	mq       *internal.MessageQueue
+	lm       *livestream.Monitor
 }
 
 func RunBlocking(cfg *RunConfig) {
-	var mdb internal.MemoryDB
+	mdb := internal.NewMemoryDB()
 
+	// ---- LOGGING ---------------------------------------------------
 	logWriters := []io.Writer{
 		os.Stdout,
-		logging.NewObservableLogger(),
+		logging.NewObservableLogger(), // for web-ui
 	}
 
+	// file based logging
 	if cfg.FileLogging {
 		logger, err := logging.NewRotableLogger(cfg.LogFile)
 		if err != nil {
@@ -76,46 +80,54 @@ func RunBlocking(cfg *RunConfig) {
 		logWriters = append(logWriters, logger)
 	}
 
-	logger := slog.New(
-		slog.NewTextHandler(io.MultiWriter(logWriters...), &slog.HandlerOptions{}),
-	)
+	logger := slog.New(slog.NewTextHandler(io.MultiWriter(logWriters...), &slog.HandlerOptions{
+		Level: slog.LevelInfo, // TODO: detect when launched in debug mode -> slog.LevelDebug
+	}))
+
+	// make the new logger the default one with all the new writers
+	slog.SetDefault(logger)
+	// ----------------------------------------------------------------
 
 	db, err := sql.Open("sqlite", cfg.DBPath)
 	if err != nil {
-		logger.Error("failed to open database", slog.String("err", err.Error()))
+		slog.Error("failed to open database", slog.String("err", err.Error()))
 	}
 
 	if err := dbutil.Migrate(context.Background(), db); err != nil {
-		logger.Error("failed to init database", slog.String("err", err.Error()))
+		slog.Error("failed to init database", slog.String("err", err.Error()))
 	}
 
-	mq, err := internal.NewMessageQueue(logger)
+	mq, err := internal.NewMessageQueue()
 	if err != nil {
 		panic(err)
 	}
 	mq.SetupConsumers()
+	go mdb.Restore(mq)
 
-	go mdb.Restore(mq, logger)
+	lm := livestream.NewMonitor(mq, mdb)
+	go lm.Schedule()
+	go lm.Restore()
 
 	srv := newServer(serverConfig{
 		frontend: cfg.App,
 		swagger:  cfg.Swagger,
-		logger:   logger,
 		host:     cfg.Host,
 		port:     cfg.Port,
-		mdb:      &mdb,
+		mdb:      mdb,
 		mq:       mq,
 		db:       db,
+		lm:       lm,
 	})
 
-	go gracefulShutdown(srv, &mdb)
-	go autoPersist(time.Minute*5, &mdb, logger)
+	go gracefulShutdown(srv, mdb)
+	go autoPersist(time.Minute*5, mdb)
 
 	var (
 		network = "tcp"
 		address = fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	)
 
+	// support unix sockets
 	if strings.HasPrefix(cfg.Host, "/") {
 		network = "unix"
 		address = cfg.Host
@@ -123,19 +135,26 @@ func RunBlocking(cfg *RunConfig) {
 
 	listener, err := net.Listen(network, address)
 	if err != nil {
-		logger.Error("failed to listen", slog.String("err", err.Error()))
+		slog.Error("failed to listen", slog.String("err", err.Error()))
 		return
 	}
 
-	logger.Info("yt-dlp-webui started", slog.String("address", address))
+	slog.Info("yt-dlp-webui started", slog.String("address", address))
 
 	if err := srv.Serve(listener); err != nil {
-		logger.Warn("http server stopped", slog.String("err", err.Error()))
+		slog.Warn("http server stopped", slog.String("err", err.Error()))
 	}
 }
 
 func newServer(c serverConfig) *http.Server {
-	service := ytdlpRPC.Container(c.mdb, c.mq, c.logger)
+	go func() {
+		for {
+			c.lm.Persist()
+			time.Sleep(time.Minute * 5)
+		}
+	}()
+
+	service := ytdlpRPC.Container(c.mdb, c.mq, c.lm)
 	rpc.Register(service)
 
 	r := chi.NewRouter()
@@ -201,10 +220,9 @@ func newServer(c serverConfig) *http.Server {
 
 	// REST API handlers
 	r.Route("/api/v1", rest.ApplyRouter(&rest.ContainerArgs{
-		DB:     c.db,
-		MDB:    c.mdb,
-		MQ:     c.mq,
-		Logger: c.logger,
+		DB:  c.db,
+		MDB: c.mdb,
+		MQ:  c.mq,
 	}))
 
 	// Logging
@@ -226,21 +244,22 @@ func gracefulShutdown(srv *http.Server, db *internal.MemoryDB) {
 
 		defer func() {
 			db.Persist()
+
 			stop()
 			srv.Shutdown(context.Background())
 		}()
 	}()
 }
 
-func autoPersist(d time.Duration, db *internal.MemoryDB, logger *slog.Logger) {
+func autoPersist(d time.Duration, db *internal.MemoryDB) {
 	for {
 		if err := db.Persist(); err != nil {
-			logger.Info(
+			slog.Warn(
 				"failed to persisted session",
 				slog.String("err", err.Error()),
 			)
 		}
-		logger.Info("sucessfully persisted session")
+		slog.Debug("sucessfully persisted session")
 		time.Sleep(d)
 	}
 }

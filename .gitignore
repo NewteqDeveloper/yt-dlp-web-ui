@@ -1,3 +1,7 @@
+.pre-commit-config.yaml
+.direnv/
+result/
+result
 dist
 .pnpm-debug.log
 node_modules
@@ -20,3 +24,4 @@ frontend/.pnp.cjs
 frontend/.pnp.loader.mjs
 frontend/.yarn/install-state.gz
 .db.lock
+livestreams.dat

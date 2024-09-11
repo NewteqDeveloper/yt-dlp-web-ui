@@ -9,6 +9,10 @@ export type RPCMethods =
   | "Service.ExecPlaylist"
   | "Service.DirectoryTree"
   | "Service.UpdateExecutable"
+  | "Service.ExecLivestream"
+  | "Service.ProgressLivestream"
+  | "Service.KillLivestream"
+  | "Service.KillAllLivestream"
 
 export type RPCRequest = {
   method: RPCMethods
@@ -35,10 +39,11 @@ type DownloadInfo = {
 }
 
 export enum ProcessStatus {
-  Pending = 0,
-  Downloading,
-  Completed,
-  Errored,
+  PENDING = 0,
+  DOWNLOADING,
+  COMPLETED,
+  ERRORED,
+  LIVESTREAM,
 }
 
 type DownloadProgress = {
@@ -77,6 +82,7 @@ export type DLFormat = {
   vcodec: string
   acodec: string
   filesize_approx: number
+  language: string
 }
 
 export type DirectoryEntry = {
@@ -97,3 +103,16 @@ export type CustomTemplate = {
   name: string
   content: string
 }
+
+export enum LiveStreamStatus {
+  WAITING,
+  IN_PROGRESS,
+  COMPLETED,
+  ERRORED
+}
+
+export type LiveStreamProgress = Record<string, {
+  status: LiveStreamStatus
+  waitTime: string
+  liveDate: string
+}>

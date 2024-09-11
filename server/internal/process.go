@@ -3,6 +3,7 @@ package internal
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,15 +14,12 @@ import (
 	"sync"
 	"syscall"
 
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
 
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/cli"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/rx"
 )
 
 const template = `download:
@@ -40,14 +38,14 @@ const (
 
 // Process descriptor
 type Process struct {
-	Id       string
-	Url      string
-	Params   []string
-	Info     DownloadInfo
-	Progress DownloadProgress
-	Output   DownloadOutput
-	proc     *os.Process
-	Logger   *slog.Logger
+	Id         string
+	Url        string
+	Livestream bool
+	Params     []string
+	Info       DownloadInfo
+	Progress   DownloadProgress
+	Output     DownloadOutput
+	proc       *os.Process
 }
 
 // Starts spawns/forks a new yt-dlp process and parse its stdout.
@@ -102,81 +100,102 @@ func (p *Process) Start() {
 
 	params := append(baseParams, p.Params...)
 
-	// ----------------- main block ----------------- //
+	slog.Info("requesting download", slog.String("url", p.Url), slog.Any("params", params))
+
 	cmd := exec.Command(config.Instance().DownloaderPath, params...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
-	r, err := cmd.StdoutPipe()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		p.Logger.Error(
-			"failed to connect to stdout",
-			slog.String("err", err.Error()),
-		)
+		slog.Error("failed to get a stdout pipe", slog.Any("err", err))
+		panic(err)
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		slog.Error("failed to get a stderr pipe", slog.Any("err", err))
 		panic(err)
 	}
 
 	if err := cmd.Start(); err != nil {
-		p.Logger.Error(
-			"failed to start yt-dlp process",
-			slog.String("err", err.Error()),
-		)
+		slog.Error("failed to start yt-dlp process", slog.Any("err", err))
 		panic(err)
 	}
 
 	p.proc = cmd.Process
 
-	// --------------- progress block --------------- //
-	var (
-		sourceChan = make(chan []byte)
-		doneChan   = make(chan struct{})
-	)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer func() {
+		stdout.Close()
+		p.Complete()
+		cancel()
+	}()
 
-	// spawn a goroutine that does the dirty job of parsing the stdout
-	// filling the channel with as many stdout line as yt-dlp produces (producer)
+	logs := make(chan []byte)
+	go produceLogs(stdout, logs)
+	go p.consumeLogs(ctx, logs)
+
+	go p.detectYtDlpErrors(stderr)
+
+	cmd.Wait()
+}
+
+func produceLogs(r io.Reader, logs chan<- []byte) {
 	go func() {
-		scan := bufio.NewScanner(r)
+		scanner := bufio.NewScanner(r)
 
-		defer func() {
-			r.Close()
-			p.Complete()
-
-			doneChan <- struct{}{}
-
-			close(sourceChan)
-			close(doneChan)
-		}()
-
-		for scan.Scan() {
-			sourceChan <- scan.Bytes()
+		for scanner.Scan() {
+			logs <- scanner.Bytes()
 		}
 	}()
+}
 
-	// Slows down the unmarshal operation to every 500ms
-	go func() {
-		rx.Sample(time.Millisecond*500, sourceChan, doneChan, func(event []byte) {
-			var progress ProgressTemplate
-
-			if err := json.Unmarshal(event, &progress); err != nil {
-				return
-			}
-
-			p.Progress = DownloadProgress{
-				Status:     StatusDownloading,
-				Percentage: progress.Percentage,
-				Speed:      progress.Speed,
-				ETA:        progress.Eta,
-			}
-
-			p.Logger.Info("progress",
+func (p *Process) consumeLogs(ctx context.Context, logs <-chan []byte) {
+	for {
+		select {
+		case <-ctx.Done():
+			slog.Info("detaching from yt-dlp stdout",
 				slog.String("id", p.getShortId()),
 				slog.String("url", p.Url),
-				slog.String("percentage", progress.Percentage),
 			)
-		})
-	}()
+			return
+		case entry := <-logs:
+			p.parseLogEntry(entry)
+		}
+	}
+}
 
-	// ------------- end progress block ------------- //
-	cmd.Wait()
+func (p *Process) parseLogEntry(entry []byte) {
+	var progress ProgressTemplate
+
+	if err := json.Unmarshal(entry, &progress); err != nil {
+		return
+	}
+
+	p.Progress = DownloadProgress{
+		Status:     StatusDownloading,
+		Percentage: progress.Percentage,
+		Speed:      progress.Speed,
+		ETA:        progress.Eta,
+	}
+
+	slog.Info("progress",
+		slog.String("id", p.getShortId()),
+		slog.String("url", p.Url),
+		slog.String("percentage", progress.Percentage),
+	)
+}
+
+func (p *Process) detectYtDlpErrors(r io.Reader) {
+	scanner := bufio.NewScanner(r)
+
+	for scanner.Scan() {
+		slog.Error("yt-dlp process error",
+			slog.String("id", p.getShortId()),
+			slog.String("url", p.Url),
+			slog.String("err", scanner.Text()),
+		)
+	}
 }
 
 // Keep process in the memoryDB but marks it as complete
@@ -190,7 +209,7 @@ func (p *Process) Complete() {
 		ETA:        0,
 	}
 
-	p.Logger.Info("finished",
+	slog.Info("finished",
 		slog.String("id", p.getShortId()),
 		slog.String("url", p.Url),
 	)
@@ -221,15 +240,22 @@ func (p *Process) Kill() error {
 }
 
 // Returns the available format for this URL
+//
 // TODO: Move out from process.go
 func (p *Process) GetFormats() (DownloadFormats, error) {
 	cmd := exec.Command(config.Instance().DownloaderPath, p.Url, "-J")
 
 	stdout, err := cmd.Output()
 	if err != nil {
-		p.Logger.Error("failed to retrieve metadata", slog.String("err", err.Error()))
+		slog.Error("failed to retrieve metadata", slog.String("err", err.Error()))
 		return DownloadFormats{}, err
 	}
+
+	slog.Info(
+		"retrieving metadata",
+		slog.String("caller", "getFormats"),
+		slog.String("url", p.Url),
+	)
 
 	info := DownloadFormats{URL: p.Url}
 	best := Format{}
@@ -240,18 +266,6 @@ func (p *Process) GetFormats() (DownloadFormats, error) {
 	)
 
 	wg.Add(2)
-
-	log.Println(
-		cli.BgRed, "Metadata", cli.Reset,
-		cli.BgBlue, "Formats", cli.Reset,
-		p.Url,
-	)
-
-	p.Logger.Info(
-		"retrieving metadata",
-		slog.String("caller", "getFormats"),
-		slog.String("url", p.Url),
-	)
 
 	go func() {
 		decodingError = json.Unmarshal(stdout, &info)
@@ -307,7 +321,7 @@ func (p *Process) SetMetadata() error {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		p.Logger.Error("failed to connect to stdout",
+		slog.Error("failed to connect to stdout",
 			slog.String("id", p.getShortId()),
 			slog.String("url", p.Url),
 			slog.String("err", err.Error()),
@@ -317,7 +331,7 @@ func (p *Process) SetMetadata() error {
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		p.Logger.Error("failed to connect to stderr",
+		slog.Error("failed to connect to stderr",
 			slog.String("id", p.getShortId()),
 			slog.String("url", p.Url),
 			slog.String("err", err.Error()),
@@ -340,7 +354,7 @@ func (p *Process) SetMetadata() error {
 		io.Copy(&bufferedStderr, stderr)
 	}()
 
-	p.Logger.Info("retrieving metadata",
+	slog.Info("retrieving metadata",
 		slog.String("id", p.getShortId()),
 		slog.String("url", p.Url),
 	)

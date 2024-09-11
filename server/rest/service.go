@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log/slog"
+	"io"
 	"os"
 	"os/exec"
 	"time"
@@ -12,13 +12,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
 	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal"
+	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal/livestream"
 )
 
 type Service struct {
-	mdb    *internal.MemoryDB
-	db     *sql.DB
-	mq     *internal.MessageQueue
-	logger *slog.Logger
+	mdb *internal.MemoryDB
+	db  *sql.DB
+	mq  *internal.MessageQueue
+	lm  *livestream.Monitor
 }
 
 func (s *Service) Exec(req internal.DownloadRequest) (string, error) {
@@ -29,7 +30,6 @@ func (s *Service) Exec(req internal.DownloadRequest) (string, error) {
 			Path:     req.Path,
 			Filename: req.Rename,
 		},
-		Logger: s.logger,
 	}
 
 	id := s.mdb.Set(p)
@@ -38,13 +38,37 @@ func (s *Service) Exec(req internal.DownloadRequest) (string, error) {
 	return id, nil
 }
 
+func (s *Service) ExecPlaylist(req internal.DownloadRequest) error {
+	return internal.PlaylistDetect(req, s.mq, s.mdb)
+}
+
+func (s *Service) ExecLivestream(req internal.DownloadRequest) {
+	s.lm.Add(req.URL)
+}
+
 func (s *Service) Running(ctx context.Context) (*[]internal.ProcessResponse, error) {
 	select {
 	case <-ctx.Done():
-		return nil, errors.New("context cancelled")
+		return nil, context.Canceled
 	default:
 		return s.mdb.All(), nil
 	}
+}
+
+func (s *Service) GetCookies(ctx context.Context) ([]byte, error) {
+	fd, err := os.Open("cookies.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	defer fd.Close()
+
+	cookies, err := io.ReadAll(fd)
+	if err != nil {
+		return nil, err
+	}
+
+	return cookies, nil
 }
 
 func (s *Service) SetCookies(ctx context.Context, cookies string) error {

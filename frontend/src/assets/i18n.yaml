@@ -24,7 +24,7 @@ languages:
     overridesAnchor: Overrides
     pathOverrideOption: Enable output path overriding
     filenameOverrideOption: Enable output file name overriding
-    customFilename: Custom filemame (leave blank to use default)
+    customFilename: Custom filename (leave blank to use default)
     customPath: Custom path
     customArgs: Enable custom yt-dlp args (great power = great responsibilities)
     customArgsInput: Custom yt-dlp arguments
@@ -56,6 +56,17 @@ languages:
     rpcPollingTimeTitle: RPC polling time
     rpcPollingTimeDescription: A lower interval results in higher CPU usage (server and client side)
     templatesReloadInfo: To register a new template it might need a page reload.
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   german:
     urlInput: Video URL
     statusTitle: Status
@@ -80,7 +91,7 @@ languages:
     overridesAnchor: Überschreibungen
     pathOverrideOption: Ausgabe-Pfad Überschreibung aktivieren
     filenameOverrideOption: Ausgabe-Dateiname Überschreibung aktivieren
-    customFilename: Custom filemame (leave blank to use default)
+    customFilename: Custom filename (leave blank to use default)
     customPath: Benutzerdefinierter Pfad
     customArgs: Benutzerdefinierte yt-dlp Argumente aktivieren (viel Macht = viel Verantwortung)
     customArgsInput: Benutzerdefinierte yt-dlp Argumente
@@ -106,6 +117,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   french:
     urlInput: URL vidéo de YouTube ou d'un autre service pris en charge
     statusTitle: Statut
@@ -158,6 +180,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   italian:
     urlInput: URL Video (uno per linea)
     statusTitle: Stato
@@ -181,7 +214,7 @@ languages:
     overridesAnchor: Sovrascritture
     pathOverrideOption: Abilita sovrascrittura percorso di output
     filenameOverrideOption: Abilita sovrascrittura del nome del file di output
-    customFilename: Custom filemame (leave blank to use default)
+    customFilename: Custom filename (leave blank to use default)
     customPath: Custom path
     customArgs: Enable custom yt-dlp args (great power = great responsabilities)
     customArgsInput: Custom yt-dlp arguments
@@ -207,6 +240,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   chinese:
     urlInput: 视频 URL
     statusTitle: 状态
@@ -256,7 +300,18 @@ languages:
     templatesEditorContentLabel: 模板内容
     logsTitle: '日志'
     awaitingLogs: '正在等待日志…'
-    bulkDownload: 'Download files in a zip archive'
+    bulkDownload: '下载 zip 压缩包中的文件'
+    livestreamURLInput: 直播 URL
+    livestreamStatusWaiting: 等待直播开始
+    livestreamStatusDownloading: 下载中
+    livestreamStatusCompleted: 已完成
+    livestreamStatusErrored: 发生错误
+    livestreamStatusUnknown: 未知
+    livestreamDownloadInfo: |
+      本功能将会监控即将开始的直播流，每个进程都会传入参数：--wait-for-video 10 （重试间隔10秒）
+      如果直播已经开始，那么依然可以下载，但是不会记录下载进度。
+      直播开始后，将会转移到下载页面
+    livestreamExperimentalWarning: 实验性功能，可能存在未知Bug，请谨慎使用
   spanish:
     urlInput: URL de YouTube u otro servicio compatible
     statusTitle: Estado
@@ -305,6 +360,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   russian:
     urlInput: URL-адрес YouTube или любого другого поддерживаемого сервиса
     statusTitle: Статус
@@ -336,23 +402,34 @@ languages:
     splashText: Нет активных загрузок
     archiveTitle: Архив
     clipboardAction: URL скопирован в буфер обмена
-    playlistCheckbox: Download playlist (it will take time, after submitting you may even close this window)
-    servedFromReverseProxyCheckbox: Is behind a reverse proxy subfolder
-    newDownloadButton: New download
+    playlistCheckbox: Скачать плейлист. Это займет время, после отправки вы сможете закрыть окно
+    servedFromReverseProxyCheckbox: Находится за обратным прокси
+    newDownloadButton: Новая загрузка
     homeButtonLabel: Home
-    archiveButtonLabel: Archive
-    settingsButtonLabel: Settings
-    rpcAuthenticationLabel: RPC authentication
-    themeTogglerLabel: Theme toggler
-    loadingLabel: Loading...
-    appTitle: App title
-    savedTemplates: Saved templates
-    templatesEditor: Templates editor
-    templatesEditorNameLabel: Template name
-    templatesEditorContentLabel: Template content
-    logsTitle: 'Logs'
-    awaitingLogs: 'Awaiting logs...'
-    bulkDownload: 'Download files in a zip archive'
+    archiveButtonLabel: Архив
+    settingsButtonLabel: Настройки
+    rpcAuthenticationLabel: RPC-аутентификация
+    themeTogglerLabel: Переключить тему
+    loadingLabel: Загрузка...
+    appTitle: Название приложения
+    savedTemplates: Сохраненные шаблоны
+    templatesEditor: Редактор шаблонов
+    templatesEditorNameLabel: Имя шаблона
+    templatesEditorContentLabel: Содержание шаблона
+    logsTitle: 'Логи'
+    awaitingLogs: 'Ожидание логов...'
+    bulkDownload: 'Скачать файлы в zip архиве'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   korean:
     urlInput: YouTube나 다른 지원되는 사이트의 URL
     statusTitle: 상태
@@ -376,7 +453,7 @@ languages:
     overridesAnchor: Overrides
     pathOverrideOption: Enable output path overriding
     filenameOverrideOption: Enable output file name overriding
-    customFilename: Custom filemame (leave blank to use default)
+    customFilename: Custom filename (leave blank to use default)
     customPath: Custom path
     customArgs: Enable custom yt-dlp args (great power = great responsabilities)
     customArgsInput: Custom yt-dlp arguments
@@ -401,6 +478,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   japanese:
     urlInput: YouTubeまたはサポート済み動画のURL
     statusTitle: 状態
@@ -450,6 +538,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   catalan:
     urlInput: URL de YouTube o d'un altre servei compatible
     statusTitle: Estat
@@ -498,6 +597,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   ukrainian:
     urlInput: URL-адреса YouTube або будь-якого іншого підтримуваного сервісу
     statusTitle: Статус
@@ -546,6 +656,17 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
   polish:
     urlInput: Adres URL YouTube lub innej obsługiwanej usługi
     statusTitle: Status
@@ -594,3 +715,79 @@ languages:
     logsTitle: 'Logs'
     awaitingLogs: 'Awaiting logs...'
     bulkDownload: 'Download files in a zip archive'
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!
+  swedish:
+    urlInput: Videolänk (en per rad)
+    statusTitle: Status
+    statusReady: Redo
+    selectFormatButton: Välj format
+    startButton: Start
+    abortAllButton: Avbryt alla
+    updateBinButton: Uppdatera yt-dlp
+    darkThemeButton: Mörkt tema
+    lightThemeButton: Ljust tema
+    settingsAnchor: Inställningar
+    serverAddressTitle: Serveraddress
+    serverPortTitle: Port
+    extractAudioCheckbox: Extrahera ljud
+    noMTimeCheckbox: Lägg inte till info om när filen senast modifierades
+    bgReminder: När du stänger denna sida så kommer nedladdningen att fortsätta i bakgrunden.
+    toastConnected: 'Ansluten till '
+    toastUpdated: Uppdaterade yt-dlp!
+    formatSelectionEnabler: Tillåt val av ljud- och bildformat
+    themeSelect: 'Tema'
+    languageSelect: 'Språk'
+    overridesAnchor: Överskrivningar
+    pathOverrideOption: Tillåt överskrivning av filsökvägen
+    filenameOverrideOption: Tillåt överskrivning av filnamn
+    customFilename: Eget filnamn (lämna blankt för standardnamn)
+    customPath: Egen filsökväg
+    customArgs: Tillåt egna yt-dlp-argument (frihet under ansvar!)
+    customArgsInput: Egna yt-dlp-argument
+    rpcConnErr: Ett fel inträffade vid anslutning till RPC-server
+    splashText: Inga pågående nedladdningar
+    archiveTitle: Arkiv
+    clipboardAction: Kopierade länken
+    playlistCheckbox: Ladda ner spellista (detta kommer ta did, efter start så kan du stänga detta fönster)
+    restartAppMessage: En sidomladdning behövs innan förändringen får effekt
+    servedFromReverseProxyCheckbox: Servern befinner sig bakom en omvänd proxy
+    urlBase: "URL-bas, måste anges när en omvänd proxy används. Standardinställning: lämna blank"
+    newDownloadButton: Ny nedladdning
+    homeButtonLabel: Hem
+    archiveButtonLabel: Arkiv
+    settingsButtonLabel: Inställningar
+    rpcAuthenticationLabel: RPC-Autentisering
+    themeTogglerLabel: Tema-knapp
+    loadingLabel: Laddar...
+    appTitle: Apptitel
+    savedTemplates: Sparade mallar
+    templatesEditor: Mallredigerare
+    templatesEditorNameLabel: Namn
+    templatesEditorContentLabel: Innehåll 
+    logsTitle: 'Loggar'
+    awaitingLogs: 'Väntar på loggar...'
+    bulkDownload: 'Ladda ner filer i ett zip-arkiv'
+    rpcPollingTimeTitle: Frekvens av RPC-uppdateringar
+    rpcPollingTimeDescription: En högre frekvens kräver mer CPU-resurser för både server och klient
+    templatesReloadInfo: För att registrera en ny mall så kan en sidomladdning krävas.
+    livestreamURLInput: Livestream URL
+    livestreamStatusWaiting: Waiting/Wait start
+    livestreamStatusDownloading: Downloading
+    livestreamStatusCompleted: Completed
+    livestreamStatusErrored: Errored
+    livestreamStatusUnknown: Unknown
+    livestreamDownloadInfo: |
+      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
+      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
+      Once started the livestream will be migrated to the downloads page.
+    livestreamExperimentalWarning: This feature is still experimental. Something might break!

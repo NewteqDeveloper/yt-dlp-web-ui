@@ -4,6 +4,7 @@ import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflin
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
 import Dashboard from '@mui/icons-material/Dashboard';
+import LiveTvIcon from '@mui/icons-material/LiveTv';
 import Menu from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TerminalIcon from '@mui/icons-material/Terminal';
@@ -128,6 +129,20 @@ export default function Layout() {
               </ListItemButton>
             </Link>
             <Link
+              to="/restart"
+              style={{
+                textDecoration: 'none',
+                color: mode === 'dark' ? '#ffffff' : '#000000DE',
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <RestartAltIcon />
+                </ListItemIcon>
+                <ListItemText primary={i18n.t('restartButtonLabel')} />
+              </ListItemButton>
+            </Link>
+            <Link
               to="/download"
               style={{
                 textDecoration: 'none',
@@ -142,7 +157,7 @@ export default function Layout() {
               </ListItemButton>
             </Link>
             <Link
-              to="/restart"
+              to={'/monitor'}
               style={{
                 textDecoration: 'none',
                 color: mode === 'dark' ? '#ffffff' : '#000000DE',
@@ -150,9 +165,9 @@ export default function Layout() {
             >
               <ListItemButton>
                 <ListItemIcon>
-                  <RestartAltIcon />
+                  <LiveTvIcon />
                 </ListItemIcon>
-                <ListItemText primary={i18n.t('restartButtonLabel')} />
+                <ListItemText primary={i18n.t('archiveButtonLabel')} />
               </ListItemButton>
             </Link>
             <Link
