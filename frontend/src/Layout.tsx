@@ -1,55 +1,57 @@
-import { ThemeProvider } from '@emotion/react';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import ChevronLeft from '@mui/icons-material/ChevronLeft';
-import Dashboard from '@mui/icons-material/Dashboard';
-import LiveTvIcon from '@mui/icons-material/LiveTv';
-import Menu from '@mui/icons-material/Menu';
-import SettingsIcon from '@mui/icons-material/Settings';
-import TerminalIcon from '@mui/icons-material/Terminal';
-import { Box, createTheme } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import { grey } from '@mui/material/colors';
-import { useMemo, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import { settingsState } from './atoms/settings';
-import AppBar from './components/AppBar';
-import Drawer from './components/Drawer';
-import Footer from './components/Footer';
-import Logout from './components/Logout';
-import SocketSubscriber from './components/SocketSubscriber';
-import ThemeToggler from './components/ThemeToggler';
-import { useI18n } from './hooks/useI18n';
-import Toaster from './providers/ToasterProvider';
+
+import { ThemeProvider } from '@emotion/react'
+import ArchiveIcon from '@mui/icons-material/Archive'
+import ChevronLeft from '@mui/icons-material/ChevronLeft'
+import Dashboard from '@mui/icons-material/Dashboard'
+import LiveTvIcon from '@mui/icons-material/LiveTv'
+import Menu from '@mui/icons-material/Menu'
+import SettingsIcon from '@mui/icons-material/Settings'
+import TerminalIcon from '@mui/icons-material/Terminal'
+import { Box, createTheme } from '@mui/material'
+import CssBaseline from '@mui/material/CssBaseline'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import { grey, red } from '@mui/material/colors'
+import { useMemo, useState } from 'react'
+import { Link, Outlet } from 'react-router-dom'
+import { settingsState } from './atoms/settings'
+import AppBar from './components/AppBar'
+import Drawer from './components/Drawer'
+import Footer from './components/Footer'
+import Logout from './components/Logout'
+import SocketSubscriber from './components/SocketSubscriber'
+import ThemeToggler from './components/ThemeToggler'
+import { useI18n } from './hooks/useI18n'
+import Toaster from './providers/ToasterProvider'
+import { useAtomValue } from 'jotai'
+import { getAccentValue } from './utils'
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
 
-  const settings = useRecoilValue(settingsState);
+  const settings = useAtomValue(settingsState)
 
-  const mode = settings.theme;
-  const theme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: settings.theme,
-          background: {
-            default: settings.theme === 'light' ? grey[50] : '#121212',
-          },
+  const mode = settings.theme
+  const theme = useMemo(() =>
+    createTheme({
+      palette: {
+        mode: settings.theme,
+        primary: {
+          main: getAccentValue(settings.accent)
         },
-      }),
-    [settings.theme]
-  );
+        background: {
+          default: settings.theme === 'light' ? grey[50] : '#121212'
+        },
+      },
+    }), [settings.theme, settings.accent]
+  )
 
   const toggleDrawer = () => setOpen((state) => !state);
 

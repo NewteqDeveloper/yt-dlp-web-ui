@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useRecoilValue } from 'recoil'
 import { serverURL } from '../atoms/settings'
 import { useI18n } from '../hooks/useI18n'
+import { useAtomValue } from 'jotai'
 
 const token = localStorage.getItem('token')
 
@@ -11,7 +11,7 @@ const LogTerminal: React.FC = () => {
 
   const boxRef = useRef<HTMLDivElement>(null)
 
-  const serverAddr = useRecoilValue(serverURL)
+  const serverAddr = useAtomValue(serverURL)
 
   const { i18n } = useI18n()
 
@@ -22,8 +22,8 @@ const LogTerminal: React.FC = () => {
 
   useEffect(() => {
     eventSource.addEventListener('log', event => {
-      const msg: string[] = JSON.parse(event.data)
-      setLogBuffer(buff => [...buff, ...msg].slice(-500))
+      const msg: string = JSON.parse(event.data)
+      setLogBuffer(buff => [...buff, msg].slice(-500))
 
       boxRef.current?.scrollTo(0, boxRef.current.scrollHeight)
     })

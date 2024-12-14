@@ -1,7 +1,14 @@
+> [!NOTE]  
+> A poll is up to decide the future of yt-dlp-web-ui frontend! If you're interested you can take part.  
+> https://github.com/marcopeocchi/yt-dlp-web-ui/discussions/223
+
 # yt-dlp Web UI
 
-A not so terrible web ui for yt-dlp.  
-Created for the only purpose of *fetching* videos from my server/nas. 
+A not so terrible web ui for yt-dlp. 
+
+High performance extendeable web ui and RPC server for yt-dlp with low impact on resources.
+
+Created for the only purpose of *fetching* videos from my server/nas and monitor upcoming livestreams. 
 
 **Docker images are available on [Docker Hub](https://hub.docker.com/r/marcobaobao/yt-dlp-webui) or [ghcr.io](https://github.com/marcopeocchi/yt-dlp-web-ui/pkgs/container/yt-dlp-web-ui)**.
 
@@ -12,6 +19,16 @@ docker pull marcobaobao/yt-dlp-webui
 # latest dev
 docker pull ghcr.io/marcopeocchi/yt-dlp-web-ui:latest
 ```
+
+## Donate to yt-dlp-webui development
+[PayPal](https://paypal.me/marcofw)
+
+*Keeps the project alive!* 😃
+
+## Some screeshots
+![image](https://github.com/user-attachments/assets/fc43a3fb-ecf9-449d-b5cb-5d5635020c00)
+![image](https://github.com/user-attachments/assets/3210f6ac-0dd8-403c-b839-3c24ff7d7d00)
+![image](https://github.com/user-attachments/assets/16450a40-cda6-4c8b-9d20-8ec36282f6ed)
 
 ## Video showcase
 [app.webm](https://github.com/marcopeocchi/yt-dlp-web-ui/assets/35533749/91545bc4-233d-4dde-8504-27422cb26964)
@@ -115,21 +132,31 @@ Usage yt-dlp-webui:
   -auth
         Enable RPC authentication
   -conf string
-        Config file path
+        Config file path (default "./config.yml")
+  -db string
+        local database path (default "local.db")
   -driver string
         yt-dlp executable path (default "yt-dlp")
-  -out string
-        Where files will be saved (default ".")
+  -fl
+        enable file based logging
   -host string
         Host where server will listen at (default "0.0.0.0")
+  -lf string
+        set log file location (default "yt-dlp-webui.log")
+  -out string
+        Where files will be saved (default ".")
+  -pass string
+        Password required for auth
   -port int
         Port where server will listen at (default 3033)
   -qs int
-        Download queue size (defaults to the number of logical CPU. A min of 2 is recomended.)
+        Queue size (concurrent downloads) (default 2)
+  -session string
+        session file path (default ".")
   -user string
         Username required for auth
-  -pass string
-        Password required for auth
+  -web string
+        frontend web resources path
 ```
 
 ### Config file
@@ -155,17 +182,26 @@ require_auth: true
 username: my_username
 password: my_random_secret
 
-# [optional] The download queue size (default: 8)
-queue_size: 4
+# [optional] The download queue size (default: logical cpu cores)
+queue_size: 4 # min. 2
 
 # [optional] Full path to the yt-dlp (default: "yt-dlp")
-downloaderPath: /usr/local/bin/yt-dlp
+#downloaderPath: /usr/local/bin/yt-dlp
+
+# [optional] Enable file based logging with rotation (default: false)
+#enable_file_logging: false
 
 # [optional] Directory where the log file will be stored (default: ".")
 #log_path: .
 
 # [optional] Directory where the session database file will be stored (default: ".")
 #session_file_path: .
+
+# [optional] Path where the sqlite database will be created/opened (default: "./local.db")
+#local_database_path
+
+# [optional] Path where a custom frontend will be loaded (instead of the embedded one)
+#frontend_path: ./web/solid-frontend
 ```
 
 ### Systemd integration
@@ -214,13 +250,9 @@ ExecStart=/usr/local/bin/yt-dlp-webui --conf /home/your_user/yt-dlp-webui-workin
 
 ## Manual installation
 ```sh
-# the dependencies are: python3, ffmpeg, nodejs, psmisc, go.
+# the dependencies are: yt-dlp, ffmpeg, nodejs, go, make.
 
-cd frontend
-npm i
-npm run build
-
-go build -o yt-dlp-webui main.go
+make all
 ```
 ## Open-API
 Navigate to `/openapi` to see the related swagger.
@@ -235,6 +267,22 @@ It is **planned** to also expose a **gRPC** server.
 
 For more information open an issue on GitHub and I will provide more info ASAP.
 
+## Custom frontend
+To load a custom frontend you need to specify its path either in the config file ([see config file](#config-file)) or via flags.
+
+The frontend needs to follow this structure:
+```
+path/to/my/frontend
+├── assets
+│   ├── js-chunk-1.js (example)
+│   ├── js-chunk-2.js (example)
+│   ├── style.css (example)
+└── index.html
+```
+
+`assets` is where the resources will be loaded.  
+`index.html` is the entrypoint.
+
 ## Nix
 This repo adds support for Nix(OS) in various ways through a `flake-parts` flake. 
 For more info, please refer to the [official documentation](https://nixos.org/learn/).
@@ -243,7 +291,7 @@ For more info, please refer to the [official documentation](https://nixos.org/le
 `yt-dlp-webui` isn't your ordinary website where to download stuff from the internet, so don't try asking for links of where this is hosted. It's a self hosted platform for a Linux NAS.
 
 ## Troubleshooting
--   **It says that it isn't connected/ip in the header is not defined.**
-    - You must set the server ip address in the settings section (gear icon).
+-   **It says that it isn't connected.**
+    - In some circumstances, you must set the server ip address or hostname in the settings section (gear icon).
 -   **The download  doesn't start.**
-    - As before server address is not specified or simply yt-dlp process takes a lot of time to fire up. (Forking yt-dlp isn't fast especially if you have a lower-end/low-power NAS/server/desktop where the server is running)
+    - Simply, yt-dlp process takes a lot of time to fire up. (yt-dlp isn't fast especially if you have a lower-end/low-power NAS/server/desktop. Furthermore some yt-dlp builds are slower than others)

@@ -8,10 +8,10 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/marcopeocchi/yt-dlp-web-ui/server"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/cli"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/openid"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/cli"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/config"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/openid"
 )
 
 var (
@@ -23,6 +23,7 @@ var (
 	downloaderPath    string
 	sessionFilePath   string
 	localDatabasePath string
+	frontendPath      string
 
 	requireAuth bool
 	username    string
@@ -52,6 +53,7 @@ func init() {
 	flag.StringVar(&downloaderPath, "driver", "yt-dlp", "yt-dlp executable path")
 	flag.StringVar(&sessionFilePath, "session", ".", "session file path")
 	flag.StringVar(&localDatabasePath, "db", "local.db", "local database path")
+	flag.StringVar(&frontendPath, "web", "", "frontend web resources path")
 
 	flag.BoolVar(&enableFileLogging, "fl", false, "enable outputting logs to a file")
 	flag.StringVar(&logFile, "lf", "yt-dlp-webui.log", "set log file location")
@@ -69,18 +71,32 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	if frontendPath != "" {
+		frontend = os.DirFS(frontendPath)
+	}
+
 	c := config.Instance()
 
-	c.Host = host
-	c.Port = port
-	c.QueueSize = queueSize
-	c.DownloadPath = downloadPath
-	c.DownloaderPath = downloaderPath
-	c.SessionFilePath = sessionFilePath
+	{
+		// init the config struct with the values from flags
+		// TODO: find an alternative way to populate the config struct from flags or config file
+		c.Host = host
+		c.Port = port
 
-	c.RequireAuth = requireAuth
-	c.Username = username
-	c.Password = password
+		c.QueueSize = queueSize
+
+		c.DownloadPath = downloadPath
+		c.DownloaderPath = downloaderPath
+		c.SessionFilePath = sessionFilePath
+		c.LocalDatabasePath = localDatabasePath
+
+		c.LogPath = logFile
+		c.EnableFileLogging = enableFileLogging
+
+		c.RequireAuth = requireAuth
+		c.Username = username
+		c.Password = password
+	}
 
 	// limit concurrent downloads for systems with 2 or less logical cores
 	if runtime.NumCPU() <= 2 {
@@ -95,12 +111,7 @@ func main() {
 	openid.Configure()
 
 	server.RunBlocking(&server.RunConfig{
-		Host:        c.Host,
-		Port:        c.Port,
-		DBPath:      localDatabasePath,
-		FileLogging: enableFileLogging,
-		LogFile:     logFile,
-		App:         frontend,
-		Swagger:     swagger,
+		App:     frontend,
+		Swagger: swagger,
 	})
 }

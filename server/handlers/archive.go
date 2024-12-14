@@ -17,8 +17,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/config"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/internal"
 )
 
 /*
@@ -158,7 +158,7 @@ func SendFile(w http.ResponseWriter, r *http.Request) {
 
 	root := config.Instance().DownloadPath
 
-	if strings.Contains(filepath.Dir(filename), root) {
+	if strings.Contains(filepath.Dir(filepath.Clean(filename)), filepath.Clean(root)) {
 		http.ServeFile(w, r, filename)
 		return
 	}
@@ -190,7 +190,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 
 	root := config.Instance().DownloadPath
 
-	if strings.Contains(filepath.Dir(filename), root) {
+	if strings.Contains(filepath.Dir(filepath.Clean(filename)), filepath.Clean(root)) {
 		w.Header().Add("Content-Disposition", "inline; filename=\""+filepath.Base(filename)+"\"")
 		w.Header().Set("Content-Type", "application/octet-stream")
 
@@ -201,6 +201,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 		}
 
 		io.Copy(w, fd)
+		return
 	}
 
 	w.WriteHeader(http.StatusUnauthorized)

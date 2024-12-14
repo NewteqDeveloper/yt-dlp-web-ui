@@ -67,6 +67,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   german:
     urlInput: Video URL
     statusTitle: Status
@@ -128,6 +129,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   french:
     urlInput: URL vidéo de YouTube ou d'un autre service pris en charge
     statusTitle: Statut
@@ -191,6 +193,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   italian:
     urlInput: URL Video (uno per linea)
     statusTitle: Stato
@@ -251,6 +254,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   chinese:
     urlInput: 视频 URL
     statusTitle: 状态
@@ -312,6 +316,7 @@ languages:
       如果直播已经开始，那么依然可以下载，但是不会记录下载进度。
       直播开始后，将会转移到下载页面
     livestreamExperimentalWarning: 实验性功能，可能存在未知Bug，请谨慎使用
+    accentSelect: 'Accent'
   spanish:
     urlInput: URL de YouTube u otro servicio compatible
     statusTitle: Estado
@@ -371,6 +376,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   russian:
     urlInput: URL-адрес YouTube или любого другого поддерживаемого сервиса
     statusTitle: Статус
@@ -430,6 +436,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   korean:
     urlInput: YouTube나 다른 지원되는 사이트의 URL
     statusTitle: 상태
@@ -489,6 +496,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   japanese:
     urlInput: YouTubeまたはサポート済み動画のURL
     statusTitle: 状態
@@ -517,38 +525,39 @@ languages:
     customPath: 保存先
     customArgs: yt-dlpのオプションの有効化 (最適設定にする場合)
     customArgsInput: yt-dlpのオプション
-    rpcConnErr: Error while conencting to RPC server
-    splashText: No active downloads
-    archiveTitle: Archive
-    clipboardAction: Copied URL to clipboard
-    playlistCheckbox: Download playlist (it will take time, after submitting you may even close this window)
-    servedFromReverseProxyCheckbox: Is behind a reverse proxy subfolder
-    newDownloadButton: New download
-    homeButtonLabel: Home
-    archiveButtonLabel: Archive
-    settingsButtonLabel: Settings
-    rpcAuthenticationLabel: RPC authentication
-    themeTogglerLabel: Theme toggler
-    loadingLabel: Loading...
-    appTitle: App title
-    savedTemplates: Saved templates
-    templatesEditor: Templates editor
-    templatesEditorNameLabel: Template name
-    templatesEditorContentLabel: Template content
-    logsTitle: 'Logs'
-    awaitingLogs: 'Awaiting logs...'
-    bulkDownload: 'Download files in a zip archive'
-    livestreamURLInput: Livestream URL
-    livestreamStatusWaiting: Waiting/Wait start
-    livestreamStatusDownloading: Downloading
-    livestreamStatusCompleted: Completed
-    livestreamStatusErrored: Errored
-    livestreamStatusUnknown: Unknown
+    rpcConnErr: RPCサーバーへの接続中にエラーが発生しました
+    splashText: アクティブなダウンロードはありません
+    archiveTitle: アーカイブ
+    clipboardAction: URLをクリップボードにコピーしました
+    playlistCheckbox: プレイリストをダウンロード (これには時間がかかりますが、処理中はウィンドウを閉じることができます)
+    servedFromReverseProxyCheckbox: リバースプロキシのサブフォルダにあります
+    newDownloadButton: 新しくダウンロード
+    homeButtonLabel: ホーム
+    archiveButtonLabel: アーカイブ
+    settingsButtonLabel: 設定
+    rpcAuthenticationLabel: RPC認証
+    themeTogglerLabel: テーマ切り替え
+    loadingLabel: 読み込み中...
+    appTitle: アプリタイトル
+    savedTemplates: 保存したテンプレート
+    templatesEditor: テンプレートエディター
+    templatesEditorNameLabel: テンプレート名
+    templatesEditorContentLabel: テンプレート内容
+    logsTitle: 'ログ'
+    awaitingLogs: 'ログを待機中...'
+    bulkDownload: 'ダウンロードしたファイルをZIPで保存'
+    livestreamURLInput: ライブストリームURL
+    livestreamStatusWaiting: 開始を待っています
+    livestreamStatusDownloading: ダウンロード中
+    livestreamStatusCompleted: 完了
+    livestreamStatusErrored: エラー
+    livestreamStatusUnknown: 不明
     livestreamDownloadInfo: |
-      This will monitor yet to start livestream. Each process will be executed with --wait-for-video 10.
-      If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
-      Once started the livestream will be migrated to the downloads page.
-    livestreamExperimentalWarning: This feature is still experimental. Something might break!
+      まだ開始されていないライブストリームを監視します。各プロセスは、--wait-for-video 10 で実行されます。
+      すでに開始されているライブストリームが提供された場合、ダウンロードは継続されますが進行状況は追跡されません。
+      ライブストリームが開始されると、ダウンロードページに移動されます。
+    livestreamExperimentalWarning: この機能は実験的なものです。何かが壊れるかもしれません！
+    accentSelect: 'Accent'
   catalan:
     urlInput: URL de YouTube o d'un altre servei compatible
     statusTitle: Estat
@@ -608,6 +617,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   ukrainian:
     urlInput: URL-адреса YouTube або будь-якого іншого підтримуваного сервісу
     statusTitle: Статус
@@ -667,6 +677,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   polish:
     urlInput: Adres URL YouTube lub innej obsługiwanej usługi
     statusTitle: Status
@@ -726,6 +737,7 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'
   swedish:
     urlInput: Videolänk (en per rad)
     statusTitle: Status
@@ -791,3 +803,4 @@ languages:
       If an already started livestream is provided it will be still downloaded but its progress will not be tracked.
       Once started the livestream will be migrated to the downloads page.
     livestreamExperimentalWarning: This feature is still experimental. Something might break!
+    accentSelect: 'Accent'

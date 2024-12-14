@@ -2,7 +2,6 @@ import { FileUpload } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
 import {
   Autocomplete,
-  Backdrop,
   Box,
   Button,
   Checkbox,
@@ -21,6 +20,7 @@ import Slide from '@mui/material/Slide'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { TransitionProps } from '@mui/material/transitions'
+import { useAtom, useAtomValue } from 'jotai'
 import {
   FC,
   Suspense,
@@ -30,16 +30,22 @@ import {
   useState,
   useTransition
 } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { customArgsState, downloadTemplateState, filenameTemplateState, savedTemplatesState } from '../atoms/downloadTemplate'
+import {
+  customArgsState,
+  downloadTemplateState,
+  filenameTemplateState,
+  savedTemplatesState
+} from '../atoms/downloadTemplate'
 import { settingsState } from '../atoms/settings'
 import { availableDownloadPathsState, connectedState } from '../atoms/status'
 import FormatsGrid from '../components/FormatsGrid'
+import { useToast } from '../hooks/toast'
 import { useI18n } from '../hooks/useI18n'
 import { useRPC } from '../hooks/useRPC'
 import type { DLMetadata } from '../types'
 import { toFormatArgs } from '../utils'
 import ExtraDownloadOptions from './ExtraDownloadOptions'
+import LoadingBackdrop from './LoadingBackdrop'
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -57,22 +63,23 @@ type Props = {
 }
 
 const DownloadDialog: FC<Props> = ({ open, onClose, onDownloadStart }) => {
-  const settings = useRecoilValue(settingsState)
-  const isConnected = useRecoilValue(connectedState)
-  const availableDownloadPaths = useRecoilValue(availableDownloadPathsState)
-  const downloadTemplate = useRecoilValue(downloadTemplateState)
-  const savedTemplates = useRecoilValue(savedTemplatesState)
+  const settings = useAtomValue(settingsState)
+  const isConnected = useAtomValue(connectedState)
+  const availableDownloadPaths = useAtomValue(availableDownloadPathsState)
+  const downloadTemplate = useAtomValue(downloadTemplateState)
+  const savedTemplates = useAtomValue(savedTemplatesState)
 
   const [downloadFormats, setDownloadFormats] = useState<DLMetadata>()
   const [pickedVideoFormat, setPickedVideoFormat] = useState('')
   const [pickedAudioFormat, setPickedAudioFormat] = useState('')
   const [pickedBestFormat, setPickedBestFormat] = useState('')
+  const [isFormatsLoading, setIsFormatsLoading] = useState(false)
 
-  const [customArgs, setCustomArgs] = useRecoilState(customArgsState)
+  const [customArgs, setCustomArgs] = useAtom(customArgsState)
 
   const [downloadPath, setDownloadPath] = useState('')
 
-  const [filenameTemplate, setFilenameTemplate] = useRecoilState(
+  const [filenameTemplate, setFilenameTemplate] = useAtom(
     filenameTemplateState
   )
 
@@ -82,6 +89,7 @@ const DownloadDialog: FC<Props> = ({ open, onClose, onDownloadStart }) => {
 
   const { i18n } = useI18n()
   const { client } = useRPC()
+  const { pushMessage } = useToast()
 
   const urlInputRef = useRef<HTMLInputElement>(null)
   const customFilenameInputRef = useRef<HTMLInputElement>(null)
@@ -129,11 +137,28 @@ const DownloadDialog: FC<Props> = ({ open, onClose, onDownloadStart }) => {
     setPickedVideoFormat('')
     setPickedBestFormat('')
 
+
+    if (isPlaylist) {
+      pushMessage('Format selection on playlist is not supported', 'warning')
+      resetInput()
+      onClose()
+      return
+    }
+
+    setIsFormatsLoading(true)
+
     client.formats(url)
       ?.then(formats => {
+        if (formats.result._type === 'playlist') {
+          pushMessage('Format selection on playlist is not supported. Downloading as playlist.', 'info')
+          resetInput()
+          onClose()
+          return
+        }
         setDownloadFormats(formats.result)
         resetInput()
       })
+      .then(() => setIsFormatsLoading(false))
   }
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,10 +200,7 @@ const DownloadDialog: FC<Props> = ({ open, onClose, onDownloadStart }) => {
       onClose={onClose}
       TransitionComponent={Transition}
     >
-      <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isPending}
-      />
+      <LoadingBackdrop isLoading={isPending || isFormatsLoading} />
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton

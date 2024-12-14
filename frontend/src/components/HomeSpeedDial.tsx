@@ -1,15 +1,19 @@
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import FolderZipIcon from '@mui/icons-material/FolderZip';
-import FormatListBulleted from '@mui/icons-material/FormatListBulleted';
-import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import BuildCircleIcon from '@mui/icons-material/BuildCircle'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import FolderZipIcon from '@mui/icons-material/FolderZip'
+import FormatListBulleted from '@mui/icons-material/FormatListBulleted'
+import ViewAgendaIcon from '@mui/icons-material/ViewAgenda'
 import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { listViewState, serverURL } from '../atoms/settings';
-import { useI18n } from '../hooks/useI18n';
-import { useRPC } from '../hooks/useRPC';
+import {
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon
+} from '@mui/material'
+import { useAtom, useAtomValue } from 'jotai'
+import { listViewState, serverURL } from '../atoms/settings'
+import { useI18n } from '../hooks/useI18n'
+import { useRPC } from '../hooks/useRPC'
 
 type Props = {
   onDownloadOpen: () => void;
@@ -22,8 +26,8 @@ const HomeSpeedDial: React.FC<Props> = ({
   onEditorOpen,
   onDownloadPersistOpen,
 }) => {
-  const serverAddr = useRecoilValue(serverURL);
-  const [listView, setListView] = useRecoilState(listViewState);
+  const serverAddr = useAtomValue(serverURL);
+  const [listView, setListView] = useAtom(listViewState);
 
   const { i18n } = useI18n();
   const { client } = useRPC();

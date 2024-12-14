@@ -19,56 +19,56 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/dbutil"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/handlers"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/internal/livestream"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/logging"
-	middlewares "github.com/marcopeocchi/yt-dlp-web-ui/server/middleware"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/openid"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/rest"
-	ytdlpRPC "github.com/marcopeocchi/yt-dlp-web-ui/server/rpc"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/config"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/dbutil"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/handlers"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/internal"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/internal/livestream"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/logging"
+	middlewares "github.com/marcopeocchi/yt-dlp-web-ui/v3/server/middleware"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/openid"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/rest"
+	ytdlpRPC "github.com/marcopeocchi/yt-dlp-web-ui/v3/server/rpc"
 
 	_ "modernc.org/sqlite"
 )
 
 type RunConfig struct {
-	Host        string
-	Port        int
-	DBPath      string
-	LogFile     string
-	FileLogging bool
-	App         fs.FS
-	Swagger     fs.FS
+	App     fs.FS
+	Swagger fs.FS
 }
 
 type serverConfig struct {
 	frontend fs.FS
 	swagger  fs.FS
-	host     string
-	port     int
 	mdb      *internal.MemoryDB
 	db       *sql.DB
 	mq       *internal.MessageQueue
 	lm       *livestream.Monitor
 }
 
-func RunBlocking(cfg *RunConfig) {
+// TODO: change scope
+var observableLogger = logging.NewObservableLogger()
+
+func RunBlocking(rc *RunConfig) {
 	mdb := internal.NewMemoryDB()
 
 	// ---- LOGGING ---------------------------------------------------
 	logWriters := []io.Writer{
 		os.Stdout,
-		logging.NewObservableLogger(), // for web-ui
+		observableLogger, // for web-ui
 	}
 
+	conf := config.Instance()
+
 	// file based logging
-	if cfg.FileLogging {
-		logger, err := logging.NewRotableLogger(cfg.LogFile)
+	if conf.EnableFileLogging {
+		logger, err := logging.NewRotableLogger(conf.LogPath)
 		if err != nil {
 			panic(err)
 		}
+
+		defer logger.Rotate()
 
 		go func() {
 			for {
@@ -88,7 +88,7 @@ func RunBlocking(cfg *RunConfig) {
 	slog.SetDefault(logger)
 	// ----------------------------------------------------------------
 
-	db, err := sql.Open("sqlite", cfg.DBPath)
+	db, err := sql.Open("sqlite", conf.LocalDatabasePath)
 	if err != nil {
 		slog.Error("failed to open database", slog.String("err", err.Error()))
 	}
@@ -109,10 +109,8 @@ func RunBlocking(cfg *RunConfig) {
 	go lm.Restore()
 
 	srv := newServer(serverConfig{
-		frontend: cfg.App,
-		swagger:  cfg.Swagger,
-		host:     cfg.Host,
-		port:     cfg.Port,
+		frontend: rc.App,
+		swagger:  rc.Swagger,
 		mdb:      mdb,
 		mq:       mq,
 		db:       db,
@@ -120,17 +118,17 @@ func RunBlocking(cfg *RunConfig) {
 	})
 
 	go gracefulShutdown(srv, mdb)
-	go autoPersist(time.Minute*5, mdb)
+	go autoPersist(time.Minute*5, mdb, lm)
 
 	var (
 		network = "tcp"
-		address = fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+		address = fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	)
 
 	// support unix sockets
-	if strings.HasPrefix(cfg.Host, "/") {
+	if strings.HasPrefix(conf.Host, "/") {
 		network = "unix"
-		address = cfg.Host
+		address = conf.Host
 	}
 
 	listener, err := net.Listen(network, address)
@@ -147,13 +145,6 @@ func RunBlocking(cfg *RunConfig) {
 }
 
 func newServer(c serverConfig) *http.Server {
-	go func() {
-		for {
-			c.lm.Persist()
-			time.Sleep(time.Minute * 5)
-		}
-	}()
-
 	service := ytdlpRPC.Container(c.mdb, c.mq, c.lm)
 	rpc.Register(service)
 
@@ -226,7 +217,7 @@ func newServer(c serverConfig) *http.Server {
 	}))
 
 	// Logging
-	r.Route("/log", logging.ApplyRouter())
+	r.Route("/log", logging.ApplyRouter(observableLogger))
 
 	return &http.Server{Handler: r}
 }
@@ -251,13 +242,14 @@ func gracefulShutdown(srv *http.Server, db *internal.MemoryDB) {
 	}()
 }
 
-func autoPersist(d time.Duration, db *internal.MemoryDB) {
+func autoPersist(d time.Duration, db *internal.MemoryDB, lm *livestream.Monitor) {
 	for {
 		if err := db.Persist(); err != nil {
+			slog.Warn("failed to persisted session", slog.Any("err", err))
+		}
+		if err := lm.Persist(); err != nil {
 			slog.Warn(
-				"failed to persisted session",
-				slog.String("err", err.Error()),
-			)
+				"failed to persisted livestreams monitor session", slog.Any("err", err.Error()))
 		}
 		slog.Debug("sucessfully persisted session")
 		time.Sleep(d)

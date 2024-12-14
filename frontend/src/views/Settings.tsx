@@ -1,5 +1,4 @@
 import {
-  Button,
   Checkbox,
   Container,
   FormControl,
@@ -18,8 +17,8 @@ import {
   Typography,
   capitalize
 } from '@mui/material'
+import { useAtom } from 'jotai'
 import { Suspense, useEffect, useMemo, useState } from 'react'
-import { useRecoilState } from 'recoil'
 import {
   Subject,
   debounceTime,
@@ -29,8 +28,11 @@ import {
 } from 'rxjs'
 import { rpcPollingTimeState } from '../atoms/rpc'
 import {
+  Accent,
   Language,
   Theme,
+  accentState,
+  accents,
   appTitleState,
   enableCustomArgsState,
   fileRenamingState,
@@ -45,34 +47,34 @@ import {
   themeState
 } from '../atoms/settings'
 import CookiesTextField from '../components/CookiesTextField'
+import UpdateBinaryButton from '../components/UpdateBinaryButton'
 import { useToast } from '../hooks/toast'
 import { useI18n } from '../hooks/useI18n'
-import { useRPC } from '../hooks/useRPC'
 import { validateDomain, validateIP } from '../utils'
 
 // NEED ABSOLUTELY TO BE SPLIT IN MULTIPLE COMPONENTS
 export default function Settings() {
-  const [reverseProxy, setReverseProxy] = useRecoilState(servedFromReverseProxyState)
-  const [baseURL, setBaseURL] = useRecoilState(servedFromReverseProxySubDirState)
+  const [reverseProxy, setReverseProxy] = useAtom(servedFromReverseProxyState)
+  const [baseURL, setBaseURL] = useAtom(servedFromReverseProxySubDirState)
 
-  const [formatSelection, setFormatSelection] = useRecoilState(formatSelectionState)
-  const [pathOverriding, setPathOverriding] = useRecoilState(pathOverridingState)
-  const [fileRenaming, setFileRenaming] = useRecoilState(fileRenamingState)
-  const [enableArgs, setEnableArgs] = useRecoilState(enableCustomArgsState)
+  const [formatSelection, setFormatSelection] = useAtom(formatSelectionState)
+  const [pathOverriding, setPathOverriding] = useAtom(pathOverridingState)
+  const [fileRenaming, setFileRenaming] = useAtom(fileRenamingState)
+  const [enableArgs, setEnableArgs] = useAtom(enableCustomArgsState)
 
-  const [serverAddr, setServerAddr] = useRecoilState(serverAddressState)
-  const [serverPort, setServerPort] = useRecoilState(serverPortState)
+  const [serverAddr, setServerAddr] = useAtom(serverAddressState)
+  const [serverPort, setServerPort] = useAtom(serverPortState)
 
-  const [pollingTime, setPollingTime] = useRecoilState(rpcPollingTimeState)
-  const [language, setLanguage] = useRecoilState(languageState)
-  const [appTitle, setApptitle] = useRecoilState(appTitleState)
+  const [pollingTime, setPollingTime] = useAtom(rpcPollingTimeState)
+  const [language, setLanguage] = useAtom(languageState)
+  const [appTitle, setApptitle] = useAtom(appTitleState)
+  const [accent, setAccent] = useAtom(accentState)
 
-  const [theme, setTheme] = useRecoilState(themeState)
+  const [theme, setTheme] = useAtom(themeState)
 
   const [invalidIP, setInvalidIP] = useState(false)
 
   const { i18n } = useI18n()
-  const { client } = useRPC()
 
   const { pushMessage } = useToast()
 
@@ -138,13 +140,6 @@ export default function Settings() {
    */
   const handleThemeChange = (event: SelectChangeEvent<Theme>) => {
     setTheme(event.target.value as Theme)
-  }
-
-  /**
-   * Updates yt-dlp binary via RPC
-   */
-  const updateBinary = () => {
-    client.updateExecutable().then(() => pushMessage(i18n.t('toastUpdated'), 'success'))
   }
 
   return (
@@ -257,7 +252,7 @@ export default function Settings() {
           Appearance
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
             <FormControl fullWidth>
               <InputLabel>{i18n.t('languageSelect')}</InputLabel>
               <Select
@@ -284,6 +279,22 @@ export default function Settings() {
                 <MenuItem value="light">Light</MenuItem>
                 <MenuItem value="dark">Dark</MenuItem>
                 <MenuItem value="system">System</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <FormControl fullWidth>
+              <InputLabel>{i18n.t('accentSelect')}</InputLabel>
+              <Select
+                defaultValue={accent}
+                label={i18n.t('accentSelect')}
+                onChange={(e) => setAccent(e.target.value as Accent)}
+              >
+                {accents.map((accent) => (
+                  <MenuItem key={accent} value={accent}>
+                    {capitalize(accent)}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -352,14 +363,8 @@ export default function Settings() {
           </Suspense>
         </Grid>
         <Grid>
-          <Stack direction="row">
-            <Button
-              sx={{ mr: 1, mt: 3 }}
-              variant="contained"
-              onClick={() => updateBinary()}
-            >
-              {i18n.t('updateBinButton')}
-            </Button>
+          <Stack direction="row" sx={{ pt: 2 }}>
+            <UpdateBinaryButton />
           </Stack>
         </Grid>
       </Paper>

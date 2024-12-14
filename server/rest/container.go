@@ -2,9 +2,9 @@ package rest
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
-	middlewares "github.com/marcopeocchi/yt-dlp-web-ui/server/middleware"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/openid"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/config"
+	middlewares "github.com/marcopeocchi/yt-dlp-web-ui/v3/server/middleware"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/openid"
 )
 
 func Container(args *ContainerArgs) *Handler {
@@ -34,6 +34,7 @@ func ApplyRouter(args *ContainerArgs) func(chi.Router) {
 		r.Post("/cookies", h.SetCookies())
 		r.Delete("/cookies", h.DeleteCookies())
 		r.Post("/template", h.AddTemplate())
+		r.Patch("/template", h.UpdateTemplate())
 		r.Get("/template/all", h.GetTemplates())
 		r.Delete("/template/{id}", h.DeleteTemplate())
 	}

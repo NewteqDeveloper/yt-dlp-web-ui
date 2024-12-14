@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/marcopeocchi/yt-dlp-web-ui/server/config"
+	"github.com/marcopeocchi/yt-dlp-web-ui/v3/server/config"
 )
 
 // In-Memory Thread-Safe Key-Value Storage with optional persistence
@@ -111,7 +111,9 @@ func (m *MemoryDB) Persist() error {
 
 // Restore a persisted state
 func (m *MemoryDB) Restore(mq *MessageQueue) {
-	fd, err := os.Open("session.dat")
+	sf := filepath.Join(config.Instance().SessionFilePath, "session.dat")
+
+	fd, err := os.Open(sf)
 	if err != nil {
 		return
 	}

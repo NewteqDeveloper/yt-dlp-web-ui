@@ -1,15 +1,15 @@
-import { Suspense, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { loadingAtom } from '../atoms/ui';
-import { useToast } from '../hooks/toast';
-import DownloadDialog from './DownloadDialog';
-import HomeSpeedDial from './HomeSpeedDial';
-import TemplatesEditor from './TemplatesEditor';
+import { useSetAtom } from 'jotai'
+import { Suspense, useState } from 'react'
+import { loadingAtom } from '../atoms/ui'
+import { useToast } from '../hooks/toast'
+import DownloadDialog from './DownloadDialog'
+import HomeSpeedDial from './HomeSpeedDial'
+import TemplatesEditor from './TemplatesEditor'
 import { useNavigate } from 'react-router-dom';
 
 const HomeActions: React.FC = () => {
-  const [, setIsLoading] = useRecoilState(loadingAtom);
   const navigate = useNavigate();
+  const setIsLoading = useSetAtom(loadingAtom)
 
   const [openDownload, setOpenDownload] = useState(false);
   const [openEditor, setOpenEditor] = useState(false);
