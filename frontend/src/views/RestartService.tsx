@@ -1,32 +1,32 @@
 import { Button, CircularProgress } from '@mui/material';
-import { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { serverURL } from '../atoms/settings';
-import { useToast } from '../hooks/toast';
+// import { useState } from 'react';
+// import { useRecoilValue } from 'recoil';
+// import { serverURL } from '../atoms/settings';
+// import { useToast } from '../hooks/toast';
 
 export default function RestartService() {
-  const [loading, setLoading] = useState(false);
-  const serverAddr = useRecoilValue(serverURL);
-  const { pushMessage } = useToast();
+  // const [loading, setLoading] = useState(false);
+  // const serverAddr = useRecoilValue(serverURL);
+  // const { pushMessage } = useToast();
 
-  const handleRestart = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${serverAddr}/restart-service`, {
-        method: 'POST',
-      });
+  // const handleRestart = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await fetch(`${serverAddr}/restart-service`, {
+  //       method: 'POST',
+  //     });
 
-      if (response.ok) {
-        pushMessage('Service restarted successfully!', 'success');
-      } else {
-        pushMessage('Failed to restart the service', 'error');
-      }
-    } catch (error) {
-      pushMessage('An error occurred while restarting the service', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (response.ok) {
+  //       pushMessage('Service restarted successfully!', 'success');
+  //     } else {
+  //       pushMessage('Failed to restart the service', 'error');
+  //     }
+  //   } catch (error) {
+  //     pushMessage('An error occurred while restarting the service', 'error');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div
@@ -39,10 +39,11 @@ export default function RestartService() {
       <Button
         variant="contained"
         color="secondary"
-        onClick={handleRestart}
-        disabled={loading}
+        onClick={() => alert('Work in progress')}
+        disabled={false}
       >
-        {loading ? <CircularProgress size={24} /> : 'Restart Service'}
+        {/* {loading ? <CircularProgress size={24} /> : 'Restart Service'} */}
+        Restart Service
       </Button>
     </div>
   );
