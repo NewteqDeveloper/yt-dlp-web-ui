@@ -28,7 +28,7 @@ import {
   useState,
   useTransition,
 } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useAtom, useAtomValue } from 'jotai';
 import {
   customArgsState,
   downloadTemplateState,
@@ -55,11 +55,11 @@ const Transition = forwardRef(function Transition(
 });
 
 const DownloadPersist: FC = () => {
-  const settings = useRecoilValue(settingsState);
-  const isConnected = useRecoilValue(connectedState);
-  const availableDownloadPaths = useRecoilValue(availableDownloadPathsState);
-  const downloadTemplate = useRecoilValue(downloadTemplateState);
-  const savedTemplates = useRecoilValue(savedTemplatesState);
+  const settings = useAtomValue(settingsState);
+  const isConnected = useAtomValue(connectedState);
+  const availableDownloadPaths = useAtomValue(availableDownloadPathsState);
+  const downloadTemplate = useAtomValue(downloadTemplateState);
+  const savedTemplates = useAtomValue(savedTemplatesState);
   const navigate = useNavigate();
 
   const [downloadFormats, setDownloadFormats] = useState<DLMetadata>();
@@ -67,11 +67,11 @@ const DownloadPersist: FC = () => {
   const [pickedAudioFormat, setPickedAudioFormat] = useState('');
   const [pickedBestFormat, setPickedBestFormat] = useState('');
 
-  const [customArgs, setCustomArgs] = useRecoilState(customArgsState);
+  const [customArgs, setCustomArgs] = useAtom(customArgsState);
 
   const [downloadPath, setDownloadPath] = useState('');
 
-  const [filenameTemplate, setFilenameTemplate] = useRecoilState(
+  const [filenameTemplate, setFilenameTemplate] = useAtom(
     filenameTemplateState
   );
 
